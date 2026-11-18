@@ -115,6 +115,5 @@ async def delete_instruction(session: AsyncSession, instruction_id: int) -> bool
     if db_instruction:
         await session.delete(db_instruction)
         await session.flush()
-        await session.refresh(db_instruction)
         return True
     return False

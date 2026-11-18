@@ -52,7 +52,6 @@ async def delete_step(session: AsyncSession, step_id: int) -> bool:
     await session.flush()
 
     await reorder_steps(session, instruction_id)
-    await session.refresh(db_step)
     return True
 
 

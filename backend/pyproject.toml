@@ -1,5 +1,5 @@
 [project]
-name = ""
+name = "Hackaton"
 version = "1.0.0"
 description = "by G么MEPE"
 requires-python = ">=3.12"
