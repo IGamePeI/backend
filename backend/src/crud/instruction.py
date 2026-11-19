@@ -1,4 +1,4 @@
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,7 +14,15 @@ async def get_instructions(
     skip: int = 0,
     limit: int = 20,
 ) -> list[instruction_model.Instruction]:
-    query = select(instruction_model.Instruction).options(selectinload(instruction_model.Instruction.author))
+    query = (
+        select(
+            instruction_model.Instruction,
+            func.count(step_model.Step.id).label("steps_count"),
+        )
+        .outerjoin(step_model.Step, step_model.Step.instruction_id == instruction_model.Instruction.id)
+        .options(selectinload(instruction_model.Instruction.author))
+        .group_by(instruction_model.Instruction.id)
+    )
 
     if category:
         query = query.filter(instruction_model.Instruction.category == category)
@@ -31,7 +39,13 @@ async def get_instructions(
 
     query = query.order_by(instruction_model.Instruction.created_at.desc()).offset(skip).limit(limit)
     result = await session.execute(query)
-    return list(result.scalars().all())
+
+    instructions = []
+    for instruction, steps_count in result.all():
+        instruction.steps_count = steps_count
+        instructions.append(instruction)
+
+    return instructions
 
 
 async def get_instruction(session: AsyncSession, instruction_id: int) -> instruction_model.Instruction | None:

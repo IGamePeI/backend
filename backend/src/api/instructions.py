@@ -15,8 +15,10 @@ from utils.modules.redis import get_redis
 
 router = APIRouter(prefix="/v1/instructions", tags=["Instructions"])
 
+class InstructionCatalogItem(instruction_schema.InstructionShort):
+    steps_count: int = 0
 
-@router.get("/", response_model=list[instruction_schema.InstructionShort])
+@router.get("/", response_model=list[InstructionCatalogItem])
 @limiter.limit("10/second")
 async def read_instructions(
     request: Request,

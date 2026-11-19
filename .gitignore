@@ -3,7 +3,6 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 .env
-.docker.env
 .python-version
 uv.lock
 .venv
